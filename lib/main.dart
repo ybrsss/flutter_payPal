@@ -1,53 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_paypal/src/flutter_paypal.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      navigatorKey: navigatorKey,
+      title: 'Flutter Paypal',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MyHomePage(title: 'Flutter Paypal Example'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -55,71 +31,173 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        body: Center(
+          child: TextButton(
+              onPressed: () => {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => UsePaypal(
+                            sandboxMode: true,
+                            clientId:
+                                "AW1TdvpSGbIM5iP4HJNI5TyTmwpY9Gv9dYw8_8yW5lYIbCqf326vrkrp0ce9TAqjEGMHiV3OqJM_aRT0",
+                            secretKey:
+                                "EHHtTDjnmTZATYBPiGzZC_AZUfMpMAzj2VZUeqlFUrRJA_C0pQNCxDccB5qoRQSEdcOnnKQhycuOWdP9",
+                            returnURL: "https://samplesite.com/return",
+                            cancelURL: "https://samplesite.com/cancel",
+                            transactions: const [
+                              {
+                                "amount": {
+                                  "total": '10.12',
+                                  "currency": "USD",
+                                  "details": {
+                                    "subtotal": '10.12',
+                                    "shipping": '0',
+                                    "shipping_discount": 0
+                                  }
+                                },
+                                "description": "The payment transaction description.",
+                                "item_list": {
+                                  "items": [
+                                    {
+                                      "name": "A demo product",
+                                      "quantity": 1,
+                                      "price": '10.12',
+                                      "currency": "USD"
+                                    }
+                                  ],
+
+                                  "shipping_address": {
+                                    "recipient_name": "Jane Foster",
+                                    "line1": "Travis County",
+                                    "line2": "",
+                                    "city": "Austin",
+                                    "country_code": "US",
+                                    "postal_code": "73301",
+                                    "phone": "+00000000",
+                                    "state": "Texas"
+                                  },
+                                }
+                              }
+                            ],
+                            note: "Contact us for any questions on your order.",
+                            onSuccess: (Map params) async {
+                              print("onSuccess: $params");
+
+                              // 延迟显示对话框，确保导航动作完成
+                              Future.delayed(const Duration(milliseconds: 300),
+                                  () {
+                                if (navigatorKey.currentContext != null) {
+                                  showDialog(
+                                    context: navigatorKey.currentContext!,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('支付成功'),
+                                        content: SingleChildScrollView(
+                                          child: Text(
+                                              '收到的数据: \n\n${_formatMapData(params)}'),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('关闭'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              });
+                            },
+                            onError: (error) {
+                              print("onError: $error");
+                              // 延迟显示对话框，确保导航动作完成
+                              Future.delayed(const Duration(milliseconds: 300),
+                                  () {
+                                if (navigatorKey.currentContext != null) {
+                                  showDialog(
+                                    context: navigatorKey.currentContext!,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('支付失败'),
+                                        content: Text('错误信息: \n\n$error'),
+                                        backgroundColor: Colors.red[50],
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('关闭'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              });
+                            },
+                            onCancel: (params) {
+                              print('cancelled: $params');
+                              // 延迟显示对话框，确保导航动作完成
+                              Future.delayed(const Duration(milliseconds: 300),
+                                  () {
+                                if (navigatorKey.currentContext != null) {
+                                  showDialog(
+                                    context: navigatorKey.currentContext!,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('支付已取消'),
+                                        content: Text('取消信息: \n\n$params'),
+                                        backgroundColor: Colors.amber[50],
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('关闭'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              });
+                            }),
+                      ),
+                    )
+                  },
+              child: const Text("PayPal支付 10.12")),
+        ));
+  }
+
+  String _formatMapData(Map data, {int indent = 0}) {
+    String result = '';
+    String indentStr = ' ' * indent;
+
+    data.forEach((key, value) {
+      if (value is Map) {
+        result +=
+            '$indentStr$key: {\n${_formatMapData(value, indent: indent + 2)}\n$indentStr}\n';
+      } else if (value is List) {
+        result += '$indentStr$key: [\n';
+        for (var item in value) {
+          if (item is Map) {
+            result +=
+                '$indentStr  {\n${_formatMapData(item, indent: indent + 4)}\n$indentStr  },\n';
+          } else {
+            result += '$indentStr  $item,\n';
+          }
+        }
+        result += '$indentStr]\n';
+      } else {
+        result += '$indentStr$key: $value\n';
+      }
+    });
+
+    return result;
   }
 }
