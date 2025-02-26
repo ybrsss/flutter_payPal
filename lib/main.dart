@@ -43,13 +43,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (BuildContext context) => UsePaypal(
+                            // 沙盒模式，生产环境需设为false
                             sandboxMode: true,
-                            clientId:
-                                "AW1TdvpSGbIM5iP4HJNI5TyTmwpY9Gv9dYw8_8yW5lYIbCqf326vrkrp0ce9TAqjEGMHiV3OqJM_aRT0",
-                            secretKey:
-                                "EHHtTDjnmTZATYBPiGzZC_AZUfMpMAzj2VZUeqlFUrRJA_C0pQNCxDccB5qoRQSEdcOnnKQhycuOWdP9",
+                            // PayPal开发者账号的客户端ID
+                            clientId: "AW1TdvpSGbIM5iP4HJNI5TyTmwpY9Gv9dYw8_8yW5lYIbCqf326vrkrp0ce9TAqjEGMHiV3OqJM_aRT0",
+                            // PayPal开发者账号的密钥
+                            secretKey: "EHHtTDjnmTZATYBPiGzZC_AZUfMpMAzj2VZUeqlFUrRJA_C0pQNCxDccB5qoRQSEdcOnnKQhycuOWdP9",
+                            // 支付成功后的回调URL，PayPal会将用户重定向到此URL
                             returnURL: "https://samplesite.com/return",
+                            // 支付取消后的回调URL
                             cancelURL: "https://samplesite.com/cancel",
+                            // 支付交易数据配置
                             transactions: const [
                               {
                                 "amount": {

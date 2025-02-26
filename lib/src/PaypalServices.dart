@@ -14,6 +14,7 @@ class PaypalServices {
     required this.sandboxMode,
   });
 
+  //  获取PayPal API访问令牌
   getAccessToken() async {
     String domain = sandboxMode
         ? "https://api.sandbox.paypal.com"
@@ -43,25 +44,28 @@ class PaypalServices {
     }
   }
 
+  // 创建PayPal支付请求
   Future<Map> createPaypalPayment(transactions, accessToken) async {
     String domain = sandboxMode
         ? "https://api.sandbox.paypal.com"
         : "https://api.paypal.com";
     try {
+      // 调用PayPal Create Payment API
       var response = await http.post(Uri.parse("$domain/v1/payments/payment"),
-          body: convert.jsonEncode(transactions),
+          body: convert.jsonEncode(transactions),  // 交易数据
           headers: {
             "content-type": "application/json",
             'Authorization': 'Bearer $accessToken' 
           });
 
       final body = convert.jsonDecode(response.body);
+      // 创建成功
       if (response.statusCode == 201) {
         if (body["links"] != null && body["links"].length > 0) {
           List links = body["links"];
 
-          String executeUrl = "";
-          String approvalUrl = "";
+          String executeUrl = ""; // 执行支付URL
+          String approvalUrl = ""; // 用户批准URL
           final item = links.firstWhere((o) => o["rel"] == "approval_url",
               orElse: () => null);
           if (item != null) {
@@ -76,6 +80,7 @@ class PaypalServices {
         }
         return {};
       } else {
+        // 创建支付失败
         return body;
       }
     } catch (e) {
@@ -83,8 +88,10 @@ class PaypalServices {
     }
   }
 
+  // 执行支付确认
   Future<Map> executePayment(url, payerId, accessToken) async {
     try {
+      // 调用PayPal Execute Payment API
       var response = await http.post(Uri.parse(url),
           body: convert.jsonEncode({"payer_id": payerId}),
           headers: {

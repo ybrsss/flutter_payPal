@@ -28,7 +28,9 @@ class _CompletePaymentState extends State<CompletePayment> {
   bool loading = true;
   bool loadingError = false;
 
+  // 完成支付流程
   complete() async {
+    // 解析重定向URL，获取支付结果参数
     final uri = Uri.parse(widget.url);
     final payerID = uri.queryParameters['PayerID'];
     if (payerID != null) {
@@ -41,13 +43,13 @@ class _CompletePaymentState extends State<CompletePayment> {
         loading = true;
         loadingError = false;
       });
-
+      // 调用PayPal的Execute Payment API完成最终支付确认
       Map resp = await widget.services
           .executePayment(widget.executeUrl, payerID, widget.accessToken);
       if (resp['error'] == false) {
         params['status'] = 'success';
-        params['data'] = resp['data'];
-        await widget.onSuccess(params);
+        params['data'] = resp['data']; // 添加API返回的完整支付数据
+        await widget.onSuccess(params); // 触发成功回调
         setState(() {
           loading = false;
           loadingError = false;

@@ -63,18 +63,22 @@ class UsePaypalState extends State<UsePaypal> {
     return temp;
   }
 
+  // 初始化并加载支付页面
   loadPayment() async {
     setState(() {
       loading = true;
     });
     try {
+      // 获取PayPal API的访问令牌
       Map getToken = await services.getAccessToken();
       if (getToken['token'] != null) {
         accessToken = getToken['token'];
+        // 准备交易参数
         final transactions = getOrderParams();
-        final res =
-            await services.createPaypalPayment(transactions, accessToken);
+        // 调用PayPal创建支付API
+        final res = await services.createPaypalPayment(transactions, accessToken);
         if (res["approvalUrl"] != null) {
+          // 获取支付页面URL和执行URL
           setState(() {
             checkoutUrl = res["approvalUrl"].toString();
             navUrl = res["approvalUrl"].toString();
@@ -83,8 +87,10 @@ class UsePaypalState extends State<UsePaypal> {
             pageLoading = false;
             loadingError = false;
           });
+          // 在WebView中加载PayPal支付页面
         _controller.loadRequest(Uri.parse(checkoutUrl));
         } else {
+          // 支付失败处理
           widget.onError(res);
           setState(() {
             loading = false;
@@ -93,6 +99,7 @@ class UsePaypalState extends State<UsePaypal> {
           });
         }
       } else {
+        // 获取令牌失败处理
         widget.onError("${getToken['message']}");
 
         setState(() {
@@ -145,11 +152,14 @@ class UsePaypalState extends State<UsePaypal> {
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
+      // WebView导航代理配置
       ..setNavigationDelegate(
         NavigationDelegate(
+          // 页面加载进度回调
           onProgress: (int progress) {
             debugPrint('WebView is loading (progress : $progress%)');
           },
+          // 页面开始加载回调
           onPageStarted: (String url) {
             if (mounted) { // 增加挂载状态检查
               setState(() {
@@ -159,6 +169,7 @@ class UsePaypalState extends State<UsePaypal> {
             }
             debugPrint('Page started loading: $url');
           },
+          // 页面加载完成回调
           onPageFinished: (String url) {
             if (mounted) { // 增加挂载状态检查
               setState(() {
@@ -177,12 +188,15 @@ class UsePaypalState extends State<UsePaypal> {
               isForMainFrame: ${error.isForMainFrame}
           ''');
           },
+          //  URL导航请求拦截
           onNavigationRequest: (NavigationRequest request) async {
             if (request.url.startsWith('https://www.youtube.com/')) {
               debugPrint('blocking navigation to ${request.url}');
               return NavigationDecision.prevent;
             }
+            // 导航到了返回URL，表示支付过程结束，需处理支付结果
             if (request.url.contains(widget.returnURL)) {
+              // 导航到支付完成处理页面
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -196,14 +210,14 @@ class UsePaypalState extends State<UsePaypal> {
                         onError: widget.onError)),
               );
             }
+            // 导航到了取消URL，表示用户取消了支付
             if (request.url.contains(widget.cancelURL)) {
               final uri = Uri.parse(request.url);
               await widget.onCancel(uri.queryParameters);
-              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             }
             debugPrint('allowing navigation to ${request.url}');
-            return NavigationDecision.navigate;
+            return NavigationDecision.navigate; // 导航继续
           },
           onUrlChange: (UrlChange change) {
             debugPrint('url change to ${change.url}');
